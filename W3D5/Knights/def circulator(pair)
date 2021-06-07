@@ -1,0 +1,12 @@
+ def circulator(pair)
+    start = [3,3]
+    steps = []
+    until steps.include?(pair)
+        start[0], start[1] = start[0]-1,start[1]-1
+        puts start
+        steps << start
+    end
+    return steps
+end
+
+
