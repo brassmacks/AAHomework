@@ -69,12 +69,21 @@ class Playwright
     attr_accessor :id, :name, :born
 
     def self.all 
-        data = PlayDBConnection.instance.execute("SELECT * FROM plays")
-        data.map { |datum| Play.new(datum) }
+        data = PlayDBConnection.instance.execute("SELECT * FROM playwrights")
+        data.map { |datum| Playwright.new(datum) }
     end
 
     def Playwright::find_by_name(name)
-        PlayDBConnection.instance.execute("SELECT * FROM playwrights WHERE name = #{name}")
+        PlayDBConnection.instance.execute(<<-SQL, name)
+          SELECT
+            *
+           FROM
+              playwrights
+            WHERE
+              name = ?
+          SQL
+          return nil unless person.length > 0 # person is stored in an array! 
+          Playwright.new(person.first)
     end
 
     def initialize(options)
@@ -109,4 +118,17 @@ class Playwright
     SQL
   end
 
+  def get_plays
+    raise "#{self} not in database" unless self.id
+    plays = PlayDBConnection.instance.execute(<<-SQL, self.id)
+    SELECT
+      *
+    FROM
+      plays
+    WHERE 
+      playwright_id = ?
+    SQL
+    plays.map { |play| Play.new(play) }
+  end
+  
 end
