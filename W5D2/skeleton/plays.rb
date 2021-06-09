@@ -14,12 +14,25 @@ end
 class Play
   attr_accessor :id, :title, :year, :playwright_id
 
+  
   def self.all
     data = PlayDBConnection.instance.execute("SELECT * FROM plays")
     data.map { |datum| Play.new(datum) }
   end
+  
+  def Play::find_by_title(title)
+      PlayDBConnection.instance.execute("SELECT * FROM plays WHERE title = #{title}")
+  end
+  
+  def Play::find_by_playwright(name)
+      PlayDBConnection.instance.execute("SELECT * FROM plays WHERE playwright = #{name}")
+  end
+  
+
 
   def initialize(options)
+    # options is a hash, id title year playwright_id are all
+    # columns from the data  
     @id = options['id']
     @title = options['title']
     @year = options['year']
@@ -32,6 +45,7 @@ class Play
       INSERT INTO
         plays (title, year, playwright_id)
       VALUES
+
         (?, ?, ?)
     SQL
     self.id = PlayDBConnection.instance.last_insert_row_id
@@ -48,4 +62,51 @@ class Play
         id = ?
     SQL
   end
+end
+
+
+class Playwright
+    attr_accessor :id, :name, :born
+
+    def self.all 
+        data = PlayDBConnection.instance.execute("SELECT * FROM plays")
+        data.map { |datum| Play.new(datum) }
+    end
+
+    def Playwright::find_by_name(name)
+        PlayDBConnection.instance.execute("SELECT * FROM playwrights WHERE name = #{name}")
+    end
+
+    def initialize(options)
+    # options is a hash, id title year playwright_id are all
+    # columns from the data  
+        @id = options['id']
+        @mame= options['name']
+        @born = options['born']
+    end
+
+  def create
+    raise "#{self} already in database" if self.id
+    PlayDBConnection.instance.execute(<<-SQL,self.name, self.born)
+      INSERT INTO
+        playwrights (name, born)
+      VALUES
+      
+        (?, ?)
+    SQL
+    self.id = PlayDBConnection.instance.last_insert_row_id
+  end
+
+  def update
+    raise "#{self} not in database" unless self.id
+    PlayDBConnection.instance.execute(<<-SQL, self.name, self.born, self.id)
+      UPDATE
+        playwrights
+      SET
+        name = ?, born = ?
+      WHERE
+        id = ?
+    SQL
+  end
+
 end
