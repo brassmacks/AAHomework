@@ -1,4 +1,6 @@
 import React from 'react';
+// action that defines the setup of the job element
+// smells like makings of a json
 
 const Job = ({title, company, type, location, description, info}) => {
   let color = "red";

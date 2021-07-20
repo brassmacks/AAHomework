@@ -1,6 +1,6 @@
 import React from 'react';
 import Job from './job';
-import selectLocation from './../actions';
+import {selectLocation} from './actions';
 
 class Widget extends React.Component {
 
@@ -10,6 +10,8 @@ class Widget extends React.Component {
 
     // require this component to re-render whenever the store's state changes
     this.props.store.subscribe(this.forceUpdate);
+
+    // changes the content of props anytime there is a forced re-render
     this.cities = ["New York","San Francisco", "Los Angeles"];
     this.selectLocation = selectLocation.bind(this);
   }
@@ -22,6 +24,7 @@ class Widget extends React.Component {
         // tell the store to update with the new location and jobs;
         // use the action creator 'selectLocation' to build the object to
         // be dispatched
+        //
         this.props.store.dispatch(this.selectLocation(city, resp))
 
       }.bind(this)
@@ -33,6 +36,10 @@ class Widget extends React.Component {
     // get the store's current state and deconstruct it into 'jobs'
     // and 'city' variables
     const { city, jobs } = this.props.store.getState();
+    
+    // getState is used to access the store that is being passed in as a prop 
+
+
     const cityOptions = this.cities.map(city => (
         <button onClick={ () => { this.fetchJobListings(city) }}
              key={city}
